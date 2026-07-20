@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a73e8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Ônibus Agulhas Negras - Horários de ônibus da Região das Agulhas Negras: Resende, Itatiaia, Penedo, Quatis, Porto Real">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Ônibus Agulhas Negras - Horários</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>Ônibus Agulhas Negras</h1>
+      <button id="themeToggle" class="btn-icon" aria-label="Alternar tema">🌙</button>
+    </div>
+    <p class="subtitle">Horários de ônibus • Resende / Itatiaia / Penedo / Quatis / Porto Real</p>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Buscar linha ou bairro..." autocomplete="off">
+    </div>
+  </header>
+
+  <main>
+    <div id="offlineBar" class="offline-bar hidden">Você está offline — horários podem estar desatualizados</div>
+
+    <div class="gps-bar" id="gpsBar">
+      <button id="gpsBtn" class="btn-gps">
+        <span id="gpsIcon">📍</span>
+        <span id="gpsText">Usar minha localização</span>
+      </button>
+      <span id="gpsStatus"></span>
+    </div>
+
+    <div id="daySelector" class="day-selector">
+      <button class="day-btn active" data-day="weekday">Dia Útil</button>
+      <button class="day-btn" data-day="saturday">Sábado</button>
+      <button class="day-btn" data-day="sunday">Domingo</button>
+      <button class="day-btn" data-day="holiday">Feriado</button>
+    </div>
+
+    <div id="nextBusBar" class="next-bus-bar hidden">
+      <span class="next-label">PRÓXIMO</span>
+      <span id="nextBusInfo">Carregando...</span>
+    </div>
+
+    <div id="linesContainer" class="lines-container"></div>
+  </main>
+
+  <footer>
+    <p class="footer-small" style="opacity:.7">Horários extraídos de fontes públicas na internet — podem conter erros ou mudanças não refletidas. A pontualidade dos serviços é de responsabilidade das viações e da fiscalização das prefeituras. Confirme sempre antes de viajar.</p>
+    <p>Desenvolvido por <a href="https://resende.com.br/lp/pedroluz" target="_blank" rel="noopener">Pedro Luz</a></p>
+    <p class="footer-small">
+      <button onclick="abrirPix()" class="pix-cta">&#9749; Gostou? Considere oferecer um cafezinho</button>
+    </p>
+  </footer>
+
+  <iframe
+    src="https://pix-br.pages.dev/?chave=pedroluz@yahoo.com&nome=Pedro+F+F+Luz&cidade=Resende+RJ&valores=10,20,50,100&mensagem=Incentive+meu+trabalho&titulo=Incentive+meu+trabalho&oferta=um+cafezinho&tema=gold"
+    id="pixFrame"
+    style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;border:none;"
+  ></iframe>
+
+  <div id="detailModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+  function abrirPix() {
+    var frame = document.getElementById('pixFrame');
+    frame.style.display = 'block';
+    frame.contentWindow.postMessage('pix-open', '*');
+  }
+  window.addEventListener('message', function(e) {
+    if (e.data === 'pix-closed') document.getElementById('pixFrame').style.display = 'none';
+  });
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
