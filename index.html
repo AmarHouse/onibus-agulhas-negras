@@ -65,33 +65,16 @@
       <button id="themeToggle" class="btn-icon" aria-label="Alternar tema">🌙</button>
     </div>
     <p class="subtitle">Horários de ônibus • Resende / Itatiaia / Penedo / Quatis / Porto Real</p>
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="search" id="searchInput" placeholder="Buscar linha ou bairro..." autocomplete="off">
-    </div>
   </header>
 
   <main>
     <div id="offlineBar" class="offline-bar hidden">Você está offline — horários podem estar desatualizados</div>
-
-    <div class="gps-bar" id="gpsBar">
-      <button id="gpsBtn" class="btn-gps">
-        <span id="gpsIcon">📍</span>
-        <span id="gpsText">Usar minha localização</span>
-      </button>
-      <span id="gpsStatus"></span>
-    </div>
 
     <div id="daySelector" class="day-selector">
       <button class="day-btn active" data-day="weekday">Dia Útil</button>
       <button class="day-btn" data-day="saturday">Sábado</button>
       <button class="day-btn" data-day="sunday">Domingo</button>
       <button class="day-btn" data-day="holiday">Feriado</button>
-    </div>
-
-    <div id="nextBusBar" class="next-bus-bar hidden">
-      <span class="next-label">PRÓXIMO</span>
-      <span id="nextBusInfo">Carregando...</span>
     </div>
 
     <div id="linesContainer" class="lines-container"></div>

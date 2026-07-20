@@ -418,10 +418,6 @@
   const state = {
     currentTab: (function () { var t = localStorage.getItem('busao-tab'); return t && t !== 'todas' ? t : 'resende'; })(),
     currentDay: getCurrentDayType(),
-    searchQuery: '',
-    gpsActive: false,
-    gpsWatchId: null,
-    nearestStop: null,
     theme: localStorage.getItem('busao-theme') || 'light',
     modalOpen: false
   };
@@ -465,23 +461,11 @@
   }
 
   function getVisibleSchedules() {
-    var query = state.searchQuery.toLowerCase().trim();
     var filtered = [];
     for (var i = 0; i < SCHEDULES.length; i++) {
       var s = SCHEDULES[i];
       if (s.tabs.indexOf(state.currentTab) === -1) continue;
-      if (query) {
-        if (s.code.toLowerCase().indexOf(query) !== -1 ||
-            s.name.toLowerCase().indexOf(query) !== -1 ||
-            s.operator.toLowerCase().indexOf(query) !== -1 ||
-            s.from.name.toLowerCase().indexOf(query) !== -1 ||
-            s.to.name.toLowerCase().indexOf(query) !== -1 ||
-            (s.info && s.info.toLowerCase().indexOf(query) !== -1)) {
-          filtered.push(s);
-        }
-      } else {
-        filtered.push(s);
-      }
+      filtered.push(s);
     }
     return filtered;
   }
@@ -491,8 +475,7 @@
     var filtered = getVisibleSchedules();
     var day = state.currentDay;
     if (filtered.length === 0) {
-      var q = (state.searchQuery || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><p>' + (q ? 'Nenhuma linha encontrada para "' + q + '"' : 'Nenhuma linha disponível para este filtro') + '</p></div>';
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><p>Nenhuma linha disponível para este filtro</p></div>';
       return;
     }
     var html = '';
@@ -526,7 +509,6 @@
         '<div class="line-header">' +
         '<span class="line-code">' + s.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>' +
         '<span class="line-name">' + s.name.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>' +
-        '<span class="operator-badge">' + s.operator.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>' +
         '<span class="line-arrow">›</span>' +
         '</div>' +
         '<div class="line-schedule-preview">' + previewHtml + nextHtml + '</div>' +
@@ -647,7 +629,6 @@
           state.currentTab = btn.getAttribute('data-tab');
           localStorage.setItem('busao-tab', state.currentTab);
           render();
-          updateNextBusBar();
         });
       })(buttons[i]);
     }
@@ -665,33 +646,9 @@
           btn.classList.add('active');
           state.currentDay = btn.getAttribute('data-day');
           render();
-          updateNextBusBar();
         });
       })(buttons[i]);
     }
-  }
-
-  function initSearch() {
-    var input = document.getElementById('searchInput');
-    var saved = localStorage.getItem('busao-query');
-    if (saved) {
-      input.value = saved;
-      state.searchQuery = saved;
-    }
-    var timer;
-    input.addEventListener('input', function () {
-      clearTimeout(timer);
-      timer = setTimeout(function () {
-        state.searchQuery = input.value;
-        localStorage.setItem('busao-query', state.searchQuery);
-        render();
-      }, 200);
-    });
-    input.addEventListener('search', function () {
-      state.searchQuery = '';
-      localStorage.removeItem('busao-query');
-      render();
-    });
   }
 
   function initOffline() {
@@ -702,110 +659,6 @@
     window.addEventListener('online', updateOffline);
     window.addEventListener('offline', updateOffline);
     updateOffline();
-  }
-
-  function initGPS() {
-    if (!navigator.geolocation) {
-      document.getElementById('gpsStatus').textContent = 'Não disponível';
-      return;
-    }
-    var btn = document.getElementById('gpsBtn');
-    var icon = document.getElementById('gpsIcon');
-    var text = document.getElementById('gpsText');
-    var status = document.getElementById('gpsStatus');
-    btn.addEventListener('click', function () {
-      if (state.gpsActive) {
-        navigator.geolocation.clearWatch(state.gpsWatchId);
-        state.gpsActive = false;
-        state.nearestStop = null;
-        btn.classList.remove('active');
-        icon.textContent = '📌';
-        text.textContent = 'Usar minha localização';
-        status.textContent = '';
-        updateNextBusBar();
-        return;
-      }
-      status.textContent = 'Buscando...';
-      state.gpsWatchId = navigator.geolocation.watchPosition(function (pos) {
-        var user = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        state.gpsActive = true;
-        btn.classList.add('active');
-        icon.textContent = '📌';
-        var nearest = null, minDist = Infinity;
-        for (var i = 0; i < BUS_STOPS.length; i++) {
-          var stop = BUS_STOPS[i];
-          var d = haversine(user.lat, user.lng, stop.lat, stop.lng);
-          if (d < minDist) { minDist = d; nearest = stop; }
-        }
-        state.nearestStop = nearest;
-        if (nearest) {
-          text.textContent = nearest.name + ' (' + minDist.toFixed(1) + 'km)';
-          status.textContent = nearest.lines.join(', ');
-        } else {
-          text.textContent = 'Nenhum ponto próximo';
-          status.textContent = '';
-        }
-        updateNextBusBar();
-      }, function (err) {
-        console.error('GPS error:', err);
-        state.gpsActive = false;
-        btn.classList.remove('active');
-        icon.textContent = '📌';
-        if (err.code === 1) {
-          status.textContent = 'Permissão negada';
-          text.textContent = 'Ative o GPS nas configurações';
-        } else if (err.code === 2) {
-          status.textContent = 'Sinal indisponível';
-          text.textContent = 'Tente novamente em área aberta';
-        } else if (err.code === 3) {
-          status.textContent = 'Tempo esgotado';
-          text.textContent = 'Tente novamente';
-        } else {
-          status.textContent = 'Erro ao obter localização';
-          text.textContent = 'Usar minha localização';
-        }
-      }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 });
-    });
-  }
-
-  function haversine(lat1, lon1, lat2, lon2) {
-    var R = 6371;
-    var dLat = (lat2 - lat1) * Math.PI / 180;
-    var dLon = (lon2 - lon1) * Math.PI / 180;
-    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  }
-
-  function updateNextBusBar() {
-    var bar = document.getElementById('nextBusBar');
-    var info = document.getElementById('nextBusInfo');
-    if (!state.gpsActive || !state.nearestStop) {
-      bar.classList.add('hidden');
-      return;
-    }
-    var day = state.currentDay;
-    var candidates = [];
-    for (var i = 0; i < SCHEDULES.length; i++) {
-      if (state.nearestStop.lines.indexOf(SCHEDULES[i].code) !== -1) {
-        candidates.push(SCHEDULES[i]);
-      }
-    }
-    var now = new Date();
-    var currentMinutes = now.getHours() * 60 + now.getMinutes();
-    var allNext = [];
-    for (var c = 0; c < candidates.length; c++) {
-      var next = getNextDepartures(candidates[c], day);
-      for (var n = 0; n < next.length; n++) {
-        allNext.push({ code: candidates[c].code, time: next[n].time, direction: next[n].direction, minutes: next[n].minutes });
-      }
-    }
-    allNext.sort(function (a, b) { return a.minutes - b.minutes; });
-    if (allNext.length > 0) {
-      bar.classList.remove('hidden');
-      info.textContent = allNext[0].code + ' — ' + allNext[0].direction + ': ' + allNext[0].time;
-    } else {
-      bar.classList.add('hidden');
-    }
   }
 
   function initTheme() {
@@ -842,15 +695,11 @@
     initTheme();
     initCityTabs();
     initDaySelector();
-    initSearch();
     initOffline();
-    initGPS();
     initModal();
     initCardClicks();
     render();
-    updateNextBusBar();
     registerSW();
-    setInterval(function () { updateNextBusBar(); }, 30000);
   });
 
 })();
