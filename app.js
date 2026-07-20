@@ -695,10 +695,101 @@
     }
   }
 
+  function initBottomNav() {
+    var buttons = document.querySelectorAll('.nav-btn');
+    for (var i = 0; i < buttons.length; i++) {
+      (function (btn) {
+        btn.addEventListener('click', function () {
+          for (var j = 0; j < buttons.length; j++) buttons[j].classList.remove('active');
+          btn.classList.add('active');
+          var tab = btn.getAttribute('data-tab');
+          document.getElementById('tabHorarios').classList.toggle('hidden', tab !== 'horarios');
+          document.getElementById('tabNoticias').classList.toggle('hidden', tab !== 'noticias');
+          document.getElementById('tabContatos').classList.toggle('hidden', tab !== 'contatos');
+          if (tab === 'contatos') renderContatos();
+          if (tab === 'noticias') fetchNews();
+        });
+      })(buttons[i]);
+    }
+  }
+
+  function renderContatos() {
+    var c = document.getElementById('contatosContainer');
+    if (c.getAttribute('data-loaded')) return;
+    c.setAttribute('data-loaded', '1');
+    c.innerHTML =
+      '<p style="margin-bottom:12px;font-weight:var(--weight-semibold);color:var(--text);font-size:var(--text-base)">🚨 Emergências</p>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">' +
+        '<div style="background:var(--color-error-bg);padding:8px 12px;border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center"><strong>Polícia Militar</strong> <a href="tel:190" style="font-weight:var(--weight-bold);color:var(--color-error);text-decoration:none">190</a></div>' +
+        '<div style="background:var(--color-error-bg);padding:8px 12px;border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center"><strong>Polícia Rodoviária Federal</strong> <a href="tel:191" style="font-weight:var(--weight-bold);color:var(--color-error);text-decoration:none">191</a></div>' +
+        '<div style="background:var(--color-error-bg);padding:8px 12px;border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center"><strong>SAMU</strong> <a href="tel:192" style="font-weight:var(--weight-bold);color:var(--color-error);text-decoration:none">192</a></div>' +
+        '<div style="background:var(--color-error-bg);padding:8px 12px;border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center"><strong>Bombeiros</strong> <a href="tel:193" style="font-weight:var(--weight-bold);color:var(--color-error);text-decoration:none">193</a></div>' +
+        '<div style="background:var(--color-error-bg);padding:8px 12px;border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center"><strong>Defesa Civil</strong> <a href="tel:199" style="font-weight:var(--weight-bold);color:var(--color-error);text-decoration:none">199</a></div>' +
+      '</div>' +
+      '<p style="margin-bottom:12px;font-weight:var(--weight-semibold);color:var(--text);font-size:var(--text-base)">🛣️ Estradas</p>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">' +
+        '<div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>CCR RioSP (BR-116/Dutra)</strong><br><a href="tel:08000173536" style="font-size:var(--text-caption);color:var(--text2);text-decoration:none">0800-017-3536</a> <span style="font-size:var(--text-caption);color:var(--text3)">— emergências na via</span></div>' +
+        '<div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Polícia Rodoviária Estadual</strong><br><a href="tel:+55243343800" style="font-size:var(--text-caption);color:var(--text2);text-decoration:none">(24) 3343-4800</a> <span style="font-size:var(--text-caption);color:var(--text3)">— 3º BPRv</span></div>' +
+      '</div>' +
+      '<p style="margin-bottom:12px;font-weight:var(--weight-semibold);color:var(--text);font-size:var(--text-base)">🚌 Viações e Transporte</p>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">' +
+        '<div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Viação Resendense</strong><br><a href="tel:+552433541636" style="font-size:var(--text-caption);color:var(--text2);text-decoration:none">(24) 3354-1636</a></div>' +
+        '<div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Viação Cidade do Aço</strong><br><a href="tel:+552433429000" style="font-size:var(--text-caption);color:var(--text2);text-decoration:none">(24) 3342-9000</a></div>' +
+        '<div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>SMT Resende (Transportes)</strong><br><a href="tel:+552433609578" style="font-size:var(--text-caption);color:var(--text2);text-decoration:none">(24) 3360-9578</a> <span style="font-size:var(--text-caption);color:var(--text3)">WhatsApp</span></div>' +
+      '</div>' +
+      '<p style="margin-bottom:12px;font-weight:var(--weight-semibold);color:var(--text);font-size:var(--text-base)">🏛️ Prefeituras</p>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">' +
+        '<div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Resende</strong><br><a href="tel:+552433609578" style="font-size:var(--text-caption);color:var(--text2);text-decoration:none">(24) 3360-9578</a> <span style="font-size:var(--text-caption);color:var(--text3)">— Transportes (WhatsApp)</span></div>' +
+        '<div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Itatiaia / Penedo</strong><br><a href="tel:+552433526777" style="font-size:var(--text-caption);color:var(--text2);text-decoration:none">(24) 3352-6777</a></div>' +
+        '<div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Quatis</strong><br><a href="tel:+552433531000" style="font-size:var(--text-caption);color:var(--text2);text-decoration:none">(24) 3353-1000</a></div>' +
+        '<div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Porto Real</strong><br><a href="tel:+552433539000" style="font-size:var(--text-caption);color:var(--text2);text-decoration:none">(24) 3353-9000</a></div>' +
+      '</div>' +
+      '<p style="margin-top:4px;margin-bottom:16px;font-size:var(--text-caption);color:var(--text3)">Horários podem sofrer alterações sem aviso prévio. Confirme sempre com a empresa. Em caso de emergência, ligue para os números acima.</p>';
+  }
+
+  function fetchNews() {
+    var c = document.getElementById('newsContainer');
+    if (c.getAttribute('data-loaded')) return;
+    c.setAttribute('data-loaded', '1');
+    c.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text2);font-size:var(--text-sm)">Carregando notícias...</div>';
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'https://api.rss2json.com/v1/api.json?rss_url=https://resende.com.br/feed/&api_key=ictxafsvjynoflcawhqj1scogaptpxhgbqzw0ah7');
+    xhr.onload = function () {
+      if (xhr.status !== 200) { showNewsError(); return; }
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (data.status !== 'ok' || !data.items || data.items.length === 0) { showNewsError(); return; }
+        var html = '<div style="display:flex;flex-direction:column;gap:12px">';
+        for (var i = 0; i < Math.min(data.items.length, 20); i++) {
+          var item = data.items[i];
+          var title = (item.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          var desc = (item.description || '').replace(/<[^>]*>/g, '').substring(0, 150).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          var link = item.link || '#';
+          var date = item.pubDate ? item.pubDate.substring(0, 10) : '';
+          html += '<a href="' + link.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener" style="display:block;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;text-decoration:none;color:var(--text);transition:border-color .2s">' +
+            '<div style="font-size:var(--text-sm);font-weight:var(--weight-semibold);margin-bottom:4px">' + title + '</div>' +
+            (desc ? '<div style="font-size:var(--text-caption);color:var(--text2)">' + desc + '</div>' : '') +
+            (date ? '<div style="font-size:var(--text-caption);color:var(--text3);margin-top:6px">' + date + '</div>' : '') +
+            '</a>';
+        }
+        html += '</div>';
+        c.innerHTML = html;
+      } catch (e) { showNewsError(); }
+    };
+    xhr.onerror = showNewsError;
+    xhr.send();
+
+    function showNewsError() {
+      c.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text2);font-size:var(--text-sm)">Não foi possível carregar as notícias. Verifique sua conexão.</div>';
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initTheme();
     initCityTabs();
     initDaySelector();
+    initBottomNav();
     initOffline();
     initModal();
     initCardClicks();
