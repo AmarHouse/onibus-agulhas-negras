@@ -574,7 +574,11 @@
     document.querySelector('.modal-backdrop').addEventListener('click', closeModal);
     document.getElementById('modalClose').addEventListener('click', closeModal);
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') {
+        var c = document.getElementById('contatosModal');
+        if (c && !c.classList.contains('hidden')) { c.classList.add('hidden'); return; }
+        closeModal();
+      }
       if (e.key === 'Tab') {
         var modal = document.getElementById('detailModal');
         if (!modal.classList.contains('hidden')) {

@@ -130,6 +130,9 @@
   }
   function abrirContatos() { document.getElementById('contatosModal').classList.remove('hidden'); }
   function fecharContatos() { document.getElementById('contatosModal').classList.add('hidden'); }
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('#contatosModal .modal-backdrop')) fecharContatos();
+  });
   window.addEventListener('message', function(e) {
     if (e.data === 'pix-closed') document.getElementById('pixFrame').style.display = 'none';
   });
