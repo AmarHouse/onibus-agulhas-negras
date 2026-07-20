@@ -85,6 +85,7 @@
     <p>Desenvolvido por <a href="https://resende.com.br/lp/pedroluz" target="_blank" rel="noopener">Pedro Luz</a></p>
     <p class="footer-small">
       <button onclick="abrirPix()" class="pix-cta">&#9749; Gostou? Considere oferecer um cafezinho</button>
+      <button onclick="abrirContatos()" class="pix-cta" style="margin-left:6px">&#9742; Contatos</button>
     </p>
   </footer>
 
@@ -95,6 +96,25 @@
   ></iframe>
 
   <div id="detailModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+  <div id="contatosModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="fecharContatos()">&times;</button>
+      <div class="modal-title" style="margin-bottom:16px">Contatos das Viações</div>
+      <div style="font-size:var(--text-sm);color:var(--text2);line-height:var(--leading-normal)">
+        <p style="margin-bottom:12px">Confirme os horários diretamente com as empresas:</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Rodoviária de Resende</strong><br><span style="font-size:var(--text-caption);color:var(--text2)">(24) 3354-9000</span></div>
+          <div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Viação Cidade do Aço</strong><br><span style="font-size:var(--text-caption);color:var(--text2)">(24) 3342-9000</span></div>
+          <div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Viação Resendense</strong><br><span style="font-size:var(--text-caption);color:var(--text2)">(24) 3354-1636</span></div>
+          <div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Via Granja / Via Martinelli</strong><br><span style="font-size:var(--text-caption);color:var(--text2)">(24) 3352-1234</span></div>
+          <div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm)"><strong>Porto Real / Quatis</strong><br><span style="font-size:var(--text-caption);color:var(--text2)">Prefeitura: (24) 3353-9000</span></div>
+        </div>
+        <p style="margin-top:14px;font-size:var(--text-caption);color:var(--text3)">Horários podem sofrer alterações sem aviso prévio. Confirme sempre com a empresa.</p>
+      </div>
+    </div>
+  </div>
     <div class="modal-backdrop"></div>
     <div class="modal-content">
       <button class="modal-close" id="modalClose">&times;</button>
@@ -108,6 +128,8 @@
     frame.style.display = 'block';
     frame.contentWindow.postMessage('pix-open', '*');
   }
+  function abrirContatos() { document.getElementById('contatosModal').classList.remove('hidden'); }
+  function fecharContatos() { document.getElementById('contatosModal').classList.add('hidden'); }
   window.addEventListener('message', function(e) {
     if (e.data === 'pix-closed') document.getElementById('pixFrame').style.display = 'none';
   });
